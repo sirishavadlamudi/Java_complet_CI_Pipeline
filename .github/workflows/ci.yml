@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 env:
-  DOCKER_IMAGE: sirisha849/my-java-app
+  DOCKER_IMAGE: sirisha849/java-app
 
 jobs:
   build:
@@ -34,16 +34,23 @@ jobs:
           push: false
           tags: ${{ env.DOCKER_IMAGE }}:latest
 
-      # 5️⃣ Trivy Scan (using stable master branch to avoid version issues)
+      # 5️⃣ Trivy Scan (scan image before pushing)
       - name: Trivy Scan
         uses: aquasecurity/trivy-action@master
-        continue-on-error: true    # <-- ensures pipeline won't fail if temp file missing
+        continue-on-error: true    # avoids breaking pipeline if temp file missing
         with:
           image-ref: ${{ env.DOCKER_IMAGE }}:latest
           exit-code: '1'
           severity: 'HIGH,CRITICAL'
 
-      # 6️⃣ Push Docker Image to Docker Hub
+      # 6️⃣ Log in to Docker Hub
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # 7️⃣ Push Docker Image to Docker Hub
       - name: Push Docker Image
         uses: docker/build-push-action@v5
         with:
@@ -51,6 +58,3 @@ jobs:
           push: true
           tags: ${{ env.DOCKER_IMAGE }}:latest
           load: true
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
