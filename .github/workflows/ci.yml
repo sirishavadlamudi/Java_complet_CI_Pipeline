@@ -45,13 +45,12 @@ jobs:
 
       # 6️⃣ Push Docker Image to Docker Hub
       - name: Push Docker Image
-  uses: docker/build-push-action@v5
-  with:
-    context: .
-    push: true
-    tags: ${{ env.DOCKER_IMAGE }}:latest
-    load: true
-  env:
-    DOCKER_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-    DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
-
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ env.DOCKER_IMAGE }}:latest
+          load: true
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
